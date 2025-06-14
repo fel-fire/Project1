@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Страница управления</title>
+</head>
+<body>
+<h3>Это страница для управления пользователями</h3>
+<p>1) Форма для регистрации нового пользователя в системе</p>
+<form id="register" action="/office" method="POST">
+    <input type="text" name="lastname" placeholder="Фамилия"/>
+    <input type="text" name="firstname" placeholder="Имя"/>
+    <input type="text" name="patronimyc" placeholder="Отчество"/><br> <p></p>
+    <input type="text" name="town" placeholder="Город"/><br> <p></p>
+    <input type="text" name="passport" placeholder="Номер паспорта в формате 9999 999999"/><br><p></p>
+    <input type="text" name="phoneNumber" placeholder="Номер телефона в формате +79999999999"/><br><p></p>
+    <input type="text" name="username" placeholder="Имя пользователя"/>
+    <input type="text" name="password" placeholder="Пароль для входа в систему"/><br><p></p>
+    <button type="submit">Зарегистрировать</button>
+</form>
+<p></p>
+<p></p>
+<p>2) Форма для получения данных о пользователе по номеру паспорта</p>
+<form id="get" action="/office" method="GET">
+    <input type="text" name="passport" placeholder="номер паспорта"/>
+    <button type="submit">Получить</button>
+</form>
+<p></p>
+<div id="result"></div>
+<p></p>
+<p></p>
+<p></p>
+<p>3) Форма для удаления пользователя из системы по номеру id</p>
+<form id="delete">
+    <input type="number" name="id" placeholder="id" required/>
+    <button type="submit">Удалить пользователя</button>
+</form>
+<p>4) Форма для изменения сведений о пользователе в системе</p>
+<p>Обратите внимание, что незаполненые поля также будут внесены в базу и будут иметь пустое значение,</p>
+<form id="update" action="/office">
+    <input type="number" name="id" placeholder="ID"/>
+    <input type="text" name="lastname" placeholder="Фамилия"/>
+    <input type="text" name="firstname" placeholder="Имя"/>
+    <input type="text" name="patronimyc" placeholder="Отчество"/><br> <p></p>
+    <input type="text" name="town" placeholder="Город"/><br> <p></p>
+    <input type="text" name="passport" placeholder="Номер паспорта в формате 9999 999999"/><br><p></p>
+    <input type="text" name="phoneNumber" placeholder="Номер телефона в формате +79999999999"/><br><p></p>
+    <input type="text" name="username" placeholder="Имя пользователя"/>
+    <input type="text" name="password" placeholder="Пароль для входа в систему"/><br><p></p>
+    <button type="submit">Обновить</button>
+</form>
+<button onclick="window.location.href='/login'">Выход из системы</button>
+<script>
+    document.getElementById('register').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+      const obj = {};
+
+        formData.forEach((value, key) => {
+        obj[key] = value;
+      });
+
+      fetch(this.action, {
+        method: this.method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(obj)
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        console.log('Ответ сервера:', data);
+      })
+      .catch(error => {
+        console.error('Ошибка:', error);
+      });
+    });
+</script>
+<script>
+    document.getElementById('delete').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const id = this.elements['id'].value.trim();
+      if (!id) {
+        alert('Пожалуйста, введите ID');
+        return;
+      }
+
+      fetch('/office/' + encodeURIComponent(id), {
+        method: 'DELETE'
+      })
+      .then(response => {
+        if (response.ok) {
+          alert('Пользователь с ID ' + id + ' удалён');
+        } else {
+          alert('Ошибка при удалении пользователя');
+        }
+      })
+      .catch(() => alert('Ошибка сети'));
+    });
+</script>
+
+<script>
+    document.getElementById('get').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const passport = this.passport.value.trim();
+      if (!passport) {
+        alert('Пожалуйста, введите номер паспорта');
+        return;
+      }
+      const apiUrl = '/office?passport=' + encodeURIComponent(passport);
+      fetch(apiUrl)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Пользователь не найден или ошибка сервера');
+          }
+          return response.json();
+        })
+        .then(data => {
+          const resultDiv = document.getElementById('result');
+          resultDiv.innerHTML = `
+            <h3>Данные пользователя:</h3>
+            <p><strong>ID:</strong> ${data.id}</p>
+            <p><strong>Фамилия:</strong> ${data.lastname}</p>
+            <p><strong>Имя:</strong> ${data.firstname}</p>
+            <p><strong>Отчество:</strong> ${data.patronimyc}</p>
+            <p><strong>Город:</strong> ${data.town}</p>
+            <p><strong>Номер телефона:</strong> ${data.phoneNumber}</p>
+            <p><strong>Имя пользователя:</strong> ${data.username}</p>
+          `;
+        })
+        .catch(error => {
+          document.getElementById('result').textContent = error.message;
+        });
+    });
+</script>
+
+<script>
+    document.getElementById('update').addEventListener('submit', function(event) {
+      event.preventDefault();
+
+      const formData = new FormData(this);
+      const obj = {};
+
+        formData.forEach((value, key) => {
+        obj[key] = value;
+      });
+
+      fetch(this.action, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(obj)
+      })
+      .then(response => response.json())
+      .then(data => {
+        alert(data.message);
+        console.log('Ответ сервера:', data);
+      })
+      .catch(error => {
+        console.error('Ошибка:', error);
+      });
+    });
+</script>
+</body>
+</html>

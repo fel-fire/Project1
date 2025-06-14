@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<p>Введите номер счета, который необходимо закрыть</p>
+<p>Обращаем Ваше внимание, что баланс счета должен быть 0</p>
+
+<form action="http://localhost:8080/accounts/close" method="POST">
+    <label for="accountNumber">Номер счета:</label>
+    <input type="number" id="accountNumber" name="accountNumber">
+    <button type="submit">Закрыть</button>
+</form>
+
+<form action="startpage.html" method="get">
+    <button type="submit">Назад</button>
+</form>
+
+</body>
+</html>

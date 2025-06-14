@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+<p>Чтобы осуществить перевод необходимо ввести номер счета отправления,</p>
+<p>номер счета получения, а также сумму перевода</p>
+
+<form action="http://localhost:8080/transfer" method="POST">
+  <label for="from">Номер счета отправления:</label>
+  <input type="number" id="from" name="from">
+
+  <label for="to">Номер счета получения:</label>
+  <input type="number" id="to" name="to">
+
+  <label for="to">Сумма перевода:</label>
+  <input type="number" id="amount" name="amount">
+
+
+
+  <button type="submit">Перевести</button>
+</form>
+
+<form action="startpage.html" method="get">
+  <button type="submit">Назад</button>
+</form>
+
+
+</body>
+</html>
